@@ -222,6 +222,8 @@ body.jumping main{opacity:0;transition-duration:.14s}
 .anchors button[aria-current="true"]{background:#f1f1f1}
 .anchors .btn.addall{margin-left:auto;height:40px;padding:0 20px;font-size:15px;background:#111;color:#fff}
 .anchors .btn.addall:hover{background:#333}
+.anchors .btn.addall.secondary,.comp-head .btn.addall.secondary{background:#fff;color:#111;border:1px solid #111}
+.anchors .btn.addall.secondary:hover,.comp-head .btn.addall.secondary:hover{background:#f4f3f0}
 .anchors i{width:8px;height:8px;border-radius:999px;flex:none}
 .anchors span{color:var(--muted);font-weight:400}
 .comp.nofilters .grid{grid-template-columns:repeat(5,minmax(0,1fr))}
@@ -237,7 +239,13 @@ body.jumping main{opacity:0;transition-duration:.14s}
 .c3.off .title{color:#6f6f6f}
 .st3{font-size:13px;line-height:20px;color:#6f6f6f;margin-top:4px}
 .st3.warn{color:var(--warn)}
-.b3{display:flex;justify-content:space-between;align-items:flex-end;gap:8px}
+.b3{display:flex;justify-content:space-between;align-items:center;gap:8px;min-height:40px}
+.tr3{display:flex;align-items:flex-start;gap:8px}
+.tr3 .title{flex:1;min-width:0}
+.fav3{width:24px;height:24px;flex:none;display:grid;place-items:center;color:var(--fg);border-radius:6px}
+.fav3 svg{width:20px;height:20px}
+.fav3:hover{background:#f4f3f0}
+.fav3.sel svg path{fill:var(--fav);stroke:var(--fav)}
 .pr3{display:flex;gap:8px;align-items:baseline}
 .pr3 s{color:var(--dis)}
 .a3{display:flex;gap:8px;flex:none}
@@ -681,7 +689,7 @@ function purchase(bi){
   }
   /* a bundle is sold only as a whole: if a position is missing, available items are bought from the composition */
   if(bi.state==='partial'){
-    return `<div class="price num cd">${rub(bi.total)}</div><div class="actions"><button class="btn secondary" type="button" data-pickcomp>Выбрать доступные позиции</button>${fav}</div>`;
+    return `<div class="price num cd">${rub(bi.total)}</div><div class="actions">${allAvIn(bi.av)?'<button class="btn secondary" type="button" data-gocart>Перейти в корзину</button>':'<button class="btn secondary" type="button" data-pickcomp>Выбрать доступные позиции</button>'}${fav}</div>`;
   }
   if(S.bundle){
     return `<div class="price num">${rub(bi.sum)}</div><div class="actions"><button class="btn secondary" type="button" data-gocart>Перейти в корзину</button>${fav}</div>`;
@@ -725,9 +733,13 @@ function compFilter(list){
   const pager=pages>1?`<nav class="pager" aria-label="Страницы"><button type="button" class="arrow" data-page="${S.page-1}" ${S.page===1?'disabled':''} aria-label="Назад">${I.chevL}</button>${Array.from({length:pages},(_,i)=>`<button type="button" data-page="${i+1}" aria-current="${S.page===i+1}">${i+1}</button>`).join('')}<button type="button" class="arrow" data-page="${S.page+1}" ${S.page===pages?'disabled':''} aria-label="Вперёд">${I.chevR}</button></nav>`:'';
   return compHead(list)+`<div class="comp ${many?'':'nofilters'}" id="comp">${filters}<div>${body}${pager}</div></div>`;
 }
+const needQ=x=>x.st==='short'?1:x.q;
+function allAvIn(av){return av.length>0&&av.every(x=>(S.cart[x.id]||0)>=needQ(x));}
+function addAllBtn(list){if(!(list.some(x=>!AVAIL(x.st))&&list.some(x=>AVAIL(x.st))))return '';
+  return allAvIn(list.filter(x=>AVAIL(x.st)))?'<button type="button" class="btn secondary addall" data-gocart>Перейти в корзину</button>':'<button type="button" class="btn primary addall" data-addavail>Добавить в корзину всё доступное</button>';}
 function compHead(list){const n=list.length;
   return `<div class="comp-head"><div class="ch-l"><h2>В комплекте ${cntTxt(n,list.reduce((s,x)=>s+x.q,0))}</h2></div>
-    <div class="ch-r">${list.some(x=>!AVAIL(x.st))&&list.some(x=>AVAIL(x.st))?'<button type="button" class="btn primary addall" data-addavail>Добавить в корзину всё доступное</button>':''}<div class="toggle" role="group" aria-label="Вид"><button type="button" data-view="grid" aria-pressed="${S.view==='grid'}" aria-label="Плитка">${I.grid}</button><button type="button" data-view="list" aria-pressed="${S.view==='list'}" aria-label="Список">${I.list}</button></div></div></div>`;}
+    <div class="ch-r">${addAllBtn(list)}<div class="toggle" role="group" aria-label="Вид"><button type="button" data-view="grid" aria-pressed="${S.view==='grid'}" aria-label="Плитка">${I.grid}</button><button type="button" data-view="list" aria-pressed="${S.view==='list'}" aria-label="Список">${I.list}</button></div></div></div>`;}
 function compHtml(list){return S.cv==='filter'?compFilter(list):S.cv==='rows'?compAnchors(list,{card:card3,noSide:true,limit:12,hide:true}):compAnchors(list);}
 /* horizontal composition card (Product Card/Composition in Figma) */
 function card3(x){
@@ -762,7 +774,7 @@ function compAnchors(list,opt={}){
   const secHtml=g=>{const collapse=g.k==='in'&&multi&&g.items.length>LIMIT&&!S.more;const items=collapse?g.items.slice(0,LIMIT):g.items;
     return `<section class="csec" id="sec-${g.k}" data-k="${g.k}">${multi?`<div class="csec-hrow"><h3 class="csec-h">${g.l} <span>(${g.items.length})</span></h3></div>`:''}${cardsHtml(items)}${collapse?`<button type="button" class="btn secondary more" data-more>Показать ещё ${g.items.length-LIMIT}</button>`:(opt.hide&&g.k==='in'&&multi&&S.more&&g.items.length>LIMIT?'<button type="button" class="btn secondary more" data-less>Скрыть</button>':'')}</section>`};
   const body=groups.length?groups.map(secHtml).join(''):`<div class="empty">Нет товаров в выбранных категориях. <button type="button" class="link" data-catreset>Сбросить</button></div>`;
-  const anchors=multi?`<nav class="anchors" aria-label="Наличие">${groups.map((g,i)=>`<button type="button" data-sec="${g.k}" aria-current="${i===0}"><i style="background:${g.c}"></i>${g.l} <span>${g.items.length}</span></button>`).join('')}${list.some(x=>!AVAIL(x.st))&&list.some(x=>AVAIL(x.st))?'<button type="button" class="btn primary addall" data-addavail>Добавить в корзину всё доступное</button>':''}</nav>`:'';
+  const anchors=multi?`<nav class="anchors" aria-label="Наличие">${groups.map((g,i)=>`<button type="button" data-sec="${g.k}" aria-current="${i===0}"><i style="background:${g.c}"></i>${g.l} <span>${g.items.length}</span></button>`).join('')}${addAllBtn(list)}</nav>`:'';
   const n=list.length;
   return `<div class="comp-head ${opt.card?'notoggle':''}"><div class="ch-l"><h2>В комплекте ${cntTxt(n,list.reduce((s,x)=>s+x.q,0))}</h2></div>
     <div class="toggle" role="group" aria-label="Вид"><button type="button" data-view="grid" aria-pressed="${S.view==='grid'}" aria-label="Плитка">${I.grid}</button><button type="button" data-view="list" aria-pressed="${S.view==='list'}" aria-label="Список">${I.list}</button></div></div>
@@ -811,7 +823,7 @@ function othersHtml(){
 function stickyHtml(list){
   const bi=bundleInfo(list); const dis=bi.state==='none'||bi.state==='nodel'; const grey=dis||bi.state==='partial';
   const btn=dis?`<button class="btn primary" type="button" disabled>${bi.state==='nodel'?'Не доставляется':'Нет в наличии'}</button>`
-    :bi.state==='partial'?`<button class="btn secondary" type="button" data-pickcomp>Выбрать доступные позиции</button>`
+    :bi.state==='partial'?(allAvIn(bi.av)?`<button class="btn secondary" type="button" data-gocart>Перейти в корзину</button>`:`<button class="btn secondary" type="button" data-pickcomp>Выбрать доступные позиции</button>`)
     :(S.bundle?`<button class="btn secondary" type="button" data-gocart>Перейти в корзину</button>`:`<button class="btn primary" type="button" data-addb>В корзину</button>`);
   return `${ph('room')}<div class="t"><div>Спальня с оливковыми акцентами</div><div class="cap c2">${cntTxt(list.length,bi.pcs)} · <span class="${bi.link.c}">${bi.link.t}</span></div></div><div class="amount num ${grey?'cd':''}">${rub(grey?bi.total:bi.sum)}</div>${btn}<button type="button" class="icon-btn ${S.bfav?'sel':''}" data-bfav aria-label="В избранное">${I.heart}</button>`;
 }
@@ -885,7 +897,7 @@ document.addEventListener('click',e=>{
   if(d.goto!==undefined){S.avail.clear();S.cats.clear();const per=16;S.page=Math.floor(+d.goto/per)+1;goTab('comp');return;}
   if(d.addb!==undefined){S.bundle=1;render();toast('Комплект добавлен в корзину','Спальня с оливковыми акцентами','room','ok');return;}
   if(d.pickcomp!==undefined){goTab('comp',false);setTimeout(()=>scrollSec('in'),60);return;}
-  if(d.addavail!==undefined){const avs=list.filter(x=>AVAIL(x.st));avs.forEach(x=>{S.cart[x.id]=1;});render();toastMulti(avs);return;}
+  if(d.addavail!==undefined){const avs=list.filter(x=>AVAIL(x.st));avs.forEach(x=>{S.cart[x.id]=Math.max(S.cart[x.id]||0,needQ(x));});render();toastMulti(avs);return;}
   if(d.city!==undefined){toast('Выбор города','В прототипе выбор города не показывается','room');return;}
   if(d.inc==='b'){S.bundle=Math.min(BUNDLE_MAX,S.bundle+1);render();return;}
   if(d.dec==='b'){S.bundle=Math.max(0,S.bundle-1);render();return;}
