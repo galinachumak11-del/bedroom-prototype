@@ -468,7 +468,7 @@ body.jumping main{opacity:0;transition-duration:.14s}
     <label class="pgroup"><span>Состояние карточки</span><span class="psel"><select id="sel-scn" data-k="scn"></select></span></label>
     <label class="pgroup"><span>Товаров</span><span class="psel"><select id="sel-cnt" data-k="cnt"></select></span></label>
     <label class="pgroup"><span>Этапов</span><span class="psel"><select id="sel-stg" data-k="stg"></select></span></label>
-    <div class="pgroup"><label for="sel-cv"><span>Состав</span></label><span class="tipw"><button type="button" class="tipb" aria-label="Что это за варианты" aria-describedby="cv-tip"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.6" stroke="currentColor" stroke-width="1.3"/><path d="M8 7.2v3.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="8" cy="5.1" r=".85" fill="currentColor"/></svg></button><span class="tip" role="tooltip" id="cv-tip"><b>3 варианта отображения состава комплекта</b> во вкладке «Состав». Выберите, чтобы сравнить:<br><br><b>1 · Якоря и секции</b> — товары сгруппированы по наличию, сверху якоря к группам, слева фильтр по категориям, карточки плиткой.<br><b>2 · Фильтр по наличию</b> — один список, наличие и категории фильтруются слева, постраничная навигация.<br><b>3 · Секции, карточки строкой</b> — те же группы с якорями, но без фильтров, горизонтальные карточки по три в ряд.</span></span><span class="psel"><select id="sel-cv" data-k="cv"></select></span></div>
+    <div class="pgroup"><label for="sel-cv"><span>Вариант состава</span></label><span class="tipw"><button type="button" class="tipb" aria-label="Что это за варианты" aria-describedby="cv-tip"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6.6" stroke="currentColor" stroke-width="1.3"/><path d="M8 7.2v3.6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/><circle cx="8" cy="5.1" r=".85" fill="currentColor"/></svg></button><span class="tip" role="tooltip" id="cv-tip"><b>2 варианта карточек в составе</b> во вкладке «Состав». Логика одна: товары сгруппированы по наличию, сверху теги-якоря к группам. Итоговый — основной.<br><br><b>Основной · карточки плиткой</b> — крупное фото, слева фильтр по категориям.<br><b>Сравнение · карточки строкой</b> — горизонтальные карточки по три в ряд, без фильтров: компактнее, больше товаров на экране.</span></span><span class="psel"><select id="sel-cv" data-k="cv"></select></span></div>
     <span class="pnote" id="pnote" role="status" aria-live="polite"></span>
     <button class="reset" id="reset" type="button" title="Очистить корзину и избранное">Сбросить корзину</button>
   </div>
@@ -836,7 +836,7 @@ const CNT_OPTS=[[1,'1'],[2,'2'],[10,'10'],[50,'50']], STG_OPTS=[[1,'1'],[4,'4'],
 function renderSeg(){
   const mk=(id,opts,key,hint=()=>'')=>{$(id).innerHTML=opts.map(([v,l])=>`<option value="${v}" ${String(S[key])===String(v)?'selected':''}>${l}${hint(v)}</option>`).join('')};
   mk('#sel-scn',SCN,'scn',v=>S.cnt<minCnt(v)?` (от ${minCnt(v)})`:'');
-  mk('#sel-cnt',CNT_OPTS,'cnt'); mk('#sel-stg',STG_OPTS,'stg'); mk('#sel-cv',[['anchors','1 · Якоря и секции'],['filter','2 · Фильтр по наличию'],['rows','3 · Секции, карточки строкой']],'cv');
+  mk('#sel-cnt',CNT_OPTS,'cnt'); mk('#sel-stg',STG_OPTS,'stg'); mk('#sel-cv',[['anchors','Основной · карточки плиткой'],['rows','Сравнение · карточки строкой']],'cv');
 }
 let noteT;
 function protoNote(t){const el=$('#pnote'); el.textContent=t; clearTimeout(noteT); noteT=setTimeout(()=>el.textContent='',5000);}
