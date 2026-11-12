@@ -133,7 +133,7 @@ body.jumping main{opacity:0;transition-duration:.14s}
 .buy h1{font-size:36px;line-height:44px;font-weight:600;margin:0;text-wrap:balance}
 .buy .sub{margin:8px 0 0;font-size:16px;line-height:24px;color:var(--fg2)}
 .items-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
-.items-head h3{margin:0;font-size:15px;line-height:24px;font-weight:600}
+.items-head h3{margin:0;font-size:15px;line-height:20px;font-weight:600}
 .items-head h3 span{color:var(--muted);font-weight:400}
 .items-link{font-weight:400;color:var(--muted);text-decoration:underline dashed 1px;text-decoration-color:#c9c9c9;text-underline-offset:6px;transition:text-decoration-color .15s}
 .items-link:hover{text-decoration-color:currentColor}
@@ -160,10 +160,10 @@ body.jumping main{opacity:0;transition-duration:.14s}
 .carousel:hover .cnav,.carousel .cnav:focus-visible{opacity:1}
 .carousel.at-start .cnav.prev,.carousel.at-end .cnav.next{opacity:0;pointer-events:none}
 .carousel .cnav:focus:not(:focus-visible){outline:none}
-.mini{flex:none;width:212px;display:flex;gap:12px;align-items:center;padding:8px 12px 8px 8px;border:1px solid var(--line);border-radius:12px;background:var(--bg);text-align:left}
+.mini{flex:none;width:252px;min-height:64px;display:flex;gap:12px;align-items:center;padding:8px 12px 8px 8px;border:1px solid var(--line);border-radius:12px;background:var(--bg);text-align:left}
 .mini .ph{width:48px;height:48px;border-radius:4px;flex:none}
 .mini{position:relative}
-.mini .t{font-size:14px;line-height:20px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mini .t{font-size:14px;line-height:20px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .mini .m{min-width:0;flex:1;display:flex;flex-direction:column;gap:4px}
 .mini .pr{font-size:13px;line-height:20px;color:#4d4d4d;display:flex;gap:4px;align-items:baseline;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mini .pr .now{font-size:14px;font-weight:600;color:var(--err)}
@@ -175,7 +175,7 @@ body.jumping main{opacity:0;transition-duration:.14s}
 .mini.dc{background:#fafafa}
 .mini.all{width:160px;justify-content:center;gap:4px;font-size:14px;line-height:20px;font-weight:600;padding:0 12px}
 .mini.all:hover{background:#f4f3f0}
-.specs h4{margin:0 0 8px;font-size:16px;line-height:24px;font-weight:600}
+.specs h4{margin:0 0 8px;font-size:15px;line-height:20px;font-weight:600}
 .spec{display:flex;align-items:flex-end;gap:8px;font-size:14px;line-height:20px}
 .spec .lab{color:var(--fg2)}
 .spec .dots{flex:1;border-bottom:1px dashed #d4d4d4;margin-bottom:5px}
@@ -653,7 +653,7 @@ function hero(list){
   const mini=sorted.slice(0,20).map(x=>{const on=AVAIL(x.st);
     const qb=x.st==='short'?'<span class="qb warn">1 из 2</span>':(x.q>1?`<span class="qb ${on?'':'un'}">× ${x.q}</span>`:'');
     const pr=!on?MINI_ST[x.st]:x.st==='sale'?`<span class="now">${rub(x.p)}</span><s>${rub(x.old)}</s>`:rub(x.p);
-    return `<button type="button" class="mini ${on?'':'off'} ${x.st==='disc'?'dc':''}" ${x.st==='disc'?'disabled':`data-open="${x.id}"`}>${ph(x.img)}${qb}<div class="m"><div class="t">${x.t}</div><div class="pr num">${pr}</div></div></button>`}).join('')+(list.length>2?`<button type="button" class="mini all" data-filter="all">Все ${list.length} ${plural(list.length,'позиция','позиции','позиций')} ${I.chevR}</button>`:'');
+    return `<button type="button" class="mini ${on?'':'off'} ${x.st==='disc'?'dc':''}" ${x.st==='disc'?'disabled':`data-open="${x.id}"`}>${ph(x.img)}${qb}<div class="m"><div class="t">${x.t}</div></div></button>`}).join('')+(list.length>2?`<button type="button" class="mini all" data-filter="all">Все ${list.length} ${plural(list.length,'позиция','позиции','позиций')} ${I.chevR}</button>`:'');
   const unavail=bi.state==='none'||bi.state==='nodel';
   return `
   <div class="crumbs">Главная / Готовые решения / Спальня</div>
