@@ -207,6 +207,8 @@ body.jumping main{opacity:0;transition-duration:.14s}
 
 /* ---------- composition ---------- */
 .comp-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+.comp-head .ch-r{display:flex;align-items:center;gap:16px}
+.comp-head .btn.addall{height:44px;padding:0 20px;font-size:15px}
 .comp-head h2{margin:0;font-size:24px;line-height:32px;font-weight:600}
 .toggle{display:flex;background:var(--n75);border-radius:999px;padding:4px;gap:4px}
 .toggle button{width:36px;height:36px;border-radius:999px;display:grid;place-items:center;color:var(--muted)}
@@ -218,6 +220,8 @@ body.jumping main{opacity:0;transition-duration:.14s}
 .anchors button{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px;border-radius:999px;font-size:15px;line-height:20px;font-weight:600;transition:background .15s}
 .anchors button:hover{background:#f4f3f0}
 .anchors button[aria-current="true"]{background:#f1f1f1}
+.anchors .btn.addall{margin-left:auto;height:40px;padding:0 20px;font-size:15px;background:#111;color:#fff}
+.anchors .btn.addall:hover{background:#333}
 .anchors i{width:8px;height:8px;border-radius:999px;flex:none}
 .anchors span{color:var(--muted);font-weight:400}
 .comp.nofilters .grid{grid-template-columns:repeat(5,minmax(0,1fr))}
@@ -723,7 +727,7 @@ function compFilter(list){
 }
 function compHead(list){const n=list.length;
   return `<div class="comp-head"><div class="ch-l"><h2>В комплекте ${cntTxt(n,list.reduce((s,x)=>s+x.q,0))}</h2></div>
-    <div class="toggle" role="group" aria-label="Вид"><button type="button" data-view="grid" aria-pressed="${S.view==='grid'}" aria-label="Плитка">${I.grid}</button><button type="button" data-view="list" aria-pressed="${S.view==='list'}" aria-label="Список">${I.list}</button></div></div>`;}
+    <div class="ch-r">${list.some(x=>!AVAIL(x.st))&&list.some(x=>AVAIL(x.st))?'<button type="button" class="btn primary addall" data-addavail>Добавить в корзину всё доступное</button>':''}<div class="toggle" role="group" aria-label="Вид"><button type="button" data-view="grid" aria-pressed="${S.view==='grid'}" aria-label="Плитка">${I.grid}</button><button type="button" data-view="list" aria-pressed="${S.view==='list'}" aria-label="Список">${I.list}</button></div></div></div>`;}
 function compHtml(list){return S.cv==='filter'?compFilter(list):S.cv==='rows'?compAnchors(list,{card:card3,noSide:true,limit:12,hide:true}):compAnchors(list);}
 /* horizontal composition card (Product Card/Composition in Figma) */
 function card3(x){
@@ -756,10 +760,9 @@ function compAnchors(list,opt={}){
   const LIMIT=opt.limit||8; /* two rows of 4 */
   const cardsHtml=items=>opt.card?`<div class="grid3">${items.map(opt.card).join('')}</div>`:S.view==='grid'?`<div class="grid">${items.map(x=>card(x)).join('')}</div>`:`<div class="list">${items.map(x=>card(x,true)).join('')}</div>`;
   const secHtml=g=>{const collapse=g.k==='in'&&multi&&g.items.length>LIMIT&&!S.more;const items=collapse?g.items.slice(0,LIMIT):g.items;
-    const addAll=g.k==='in'&&list.some(x=>!AVAIL(x.st));
-    return `<section class="csec" id="sec-${g.k}" data-k="${g.k}">${multi?`<div class="csec-hrow"><h3 class="csec-h">${g.l} <span>(${g.items.length})</span></h3>${addAll?'<button type="button" class="btn secondary sm" data-addavail>Добавить всё доступное</button>':''}</div>`:''}${cardsHtml(items)}${collapse?`<button type="button" class="btn secondary more" data-more>Показать ещё ${g.items.length-LIMIT}</button>`:(opt.hide&&g.k==='in'&&multi&&S.more&&g.items.length>LIMIT?'<button type="button" class="btn secondary more" data-less>Скрыть</button>':'')}</section>`};
+    return `<section class="csec" id="sec-${g.k}" data-k="${g.k}">${multi?`<div class="csec-hrow"><h3 class="csec-h">${g.l} <span>(${g.items.length})</span></h3></div>`:''}${cardsHtml(items)}${collapse?`<button type="button" class="btn secondary more" data-more>Показать ещё ${g.items.length-LIMIT}</button>`:(opt.hide&&g.k==='in'&&multi&&S.more&&g.items.length>LIMIT?'<button type="button" class="btn secondary more" data-less>Скрыть</button>':'')}</section>`};
   const body=groups.length?groups.map(secHtml).join(''):`<div class="empty">Нет товаров в выбранных категориях. <button type="button" class="link" data-catreset>Сбросить</button></div>`;
-  const anchors=multi?`<nav class="anchors" aria-label="Наличие">${groups.map((g,i)=>`<button type="button" data-sec="${g.k}" aria-current="${i===0}"><i style="background:${g.c}"></i>${g.l} <span>${g.items.length}</span></button>`).join('')}</nav>`:'';
+  const anchors=multi?`<nav class="anchors" aria-label="Наличие">${groups.map((g,i)=>`<button type="button" data-sec="${g.k}" aria-current="${i===0}"><i style="background:${g.c}"></i>${g.l} <span>${g.items.length}</span></button>`).join('')}${list.some(x=>!AVAIL(x.st))&&list.some(x=>AVAIL(x.st))?'<button type="button" class="btn primary addall" data-addavail>Добавить в корзину всё доступное</button>':''}</nav>`:'';
   const n=list.length;
   return `<div class="comp-head ${opt.card?'notoggle':''}"><div class="ch-l"><h2>В комплекте ${cntTxt(n,list.reduce((s,x)=>s+x.q,0))}</h2></div>
     <div class="toggle" role="group" aria-label="Вид"><button type="button" data-view="grid" aria-pressed="${S.view==='grid'}" aria-label="Плитка">${I.grid}</button><button type="button" data-view="list" aria-pressed="${S.view==='list'}" aria-label="Список">${I.list}</button></div></div>
@@ -931,7 +934,7 @@ function bindAfter(){
   const mt=$('#mini-track'),mc=$('#mini-car'); if(mt&&mc){const u=()=>{mc.classList.toggle('at-start',mt.scrollLeft<4);mc.classList.toggle('at-end',mt.scrollLeft+mt.clientWidth>=mt.scrollWidth-4)};mt.onscroll=u;u();}
   // composition anchors highlight
   secIo&&secIo.disconnect();
-  const ancs=[...document.querySelectorAll('.anchors button')]; if(ancs.length){secIo=new IntersectionObserver(es=>{es.forEach(en=>{if(en.isIntersecting){const k=en.target.dataset.k;ancs.forEach(a=>a.setAttribute('aria-current',a.dataset.sec===k));}})},{rootMargin:'-160px 0px -55% 0px'});document.querySelectorAll('.csec').forEach(x=>secIo.observe(x));}
+  const ancs=[...document.querySelectorAll('.anchors button[data-sec]')]; if(ancs.length){secIo=new IntersectionObserver(es=>{es.forEach(en=>{if(en.isIntersecting){const k=en.target.dataset.k;ancs.forEach(a=>a.setAttribute('aria-current',a.dataset.sec===k));}})},{rootMargin:'-160px 0px -55% 0px'});document.querySelectorAll('.csec').forEach(x=>secIo.observe(x));}
   // others arrows
   const ot=$('#o-track'); const upd=()=>{$('#o-prev').disabled=ot.scrollLeft<4;$('#o-next').disabled=ot.scrollLeft+ot.clientWidth>=ot.scrollWidth-4};ot.onscroll=upd;upd();
   // toc
