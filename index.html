@@ -665,7 +665,7 @@ function hero(list){
   const mini=sorted.slice(0,20).map(x=>{const on=AVAIL(x.st);
     const qb=x.st==='short'?'<span class="qb warn">1 из 2</span>':(x.q>1?`<span class="qb ${on?'':'un'}">× ${x.q}</span>`:'');
     const pr=!on?MINI_ST[x.st]:x.st==='sale'?`<span class="now">${rub(x.p)}</span><s>${rub(x.old)}</s>`:rub(x.p);
-    return `<button type="button" class="mini ${on?'':'off'} ${x.st==='disc'?'dc':''}" ${x.st==='disc'?'disabled':`data-open="${x.id}"`}>${ph(x.img)}${qb}<div class="m"><div class="t">${x.t}</div></div></button>`}).join('')+(list.length>2?`<button type="button" class="mini all" data-filter="all">Все ${list.length} ${plural(list.length,'позиция','позиции','позиций')} ${I.chevR}</button>`:'');
+    return `<button type="button" class="mini ${on?'':'off'} ${x.st==='disc'?'dc':''}" ${x.st==='disc'?'disabled':`data-open="${x.id}"`}>${ph(x.img)}${qb}<div class="m"><div class="t">${x.t}</div></div></button>`}).join('');
   const unavail=bi.state==='none'||bi.state==='nodel';
   return `
   <div class="crumbs">Главная / Готовые решения / Спальня</div>
